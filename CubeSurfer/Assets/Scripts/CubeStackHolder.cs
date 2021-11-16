@@ -7,11 +7,12 @@ public class CubeStackHolder : MonoBehaviour
 {
     public Action<Cube> CubeStackAdd;
     public Action<Cube> CubeStackRemove;
-
+    public StateManager stateManager;
     public Transform ParentOfCubes;
     [SerializeField]
     public List<Cube> CaughtCubes = new List<Cube>();
     public Transform Player;
+    public SplineWalker walker;
 
     private int ObjectsToFallCount = 0;
     private void Start()
@@ -40,7 +41,18 @@ public class CubeStackHolder : MonoBehaviour
         ObjectsToFallCount++;
         cube.transform.parent = null;
         CaughtCubes.Remove(cube);
+        Destroy(cube, 2f);
         Debug.Log("removecube");
+        if(CaughtCubes.Count == 1 && StateManager.CurrentState != StateManager.State.EndPlatform)
+        {
+            StateManager.CurrentState = StateManager.State.Lost;
+            walker.enabled = false;
+        }
+        if (CaughtCubes.Count == 0 && StateManager.CurrentState == StateManager.State.EndPlatform)
+        {
+            StateManager.CurrentState = StateManager.State.Won;
+            walker.enabled = false;
+        }
     }
 
     public void FallToTheGround()

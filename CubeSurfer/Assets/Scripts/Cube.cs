@@ -21,5 +21,11 @@ public class Cube : MonoBehaviour
         {
             holder.CubeStackRemove(this);
         }
+        if(other.CompareTag("FinalObstacle"))
+        {
+            StateManager.CurrentState = StateManager.State.EndPlatform;
+            holder.CubeStackRemove(this);
+
+        }
     }
 }
