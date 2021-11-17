@@ -13,8 +13,9 @@ public class CubeStackHolder : MonoBehaviour
     public List<Cube> CaughtCubes = new List<Cube>();
     public Transform Player;
     public SplineWalker walker;
+    public LevelManager LevelMan;
 
-    private int ObjectsToFallCount = 0;
+    public int ObjectsToFallCount = 0;
     private void Start()
     {
         CubeStackAdd += AddCube;
@@ -43,16 +44,30 @@ public class CubeStackHolder : MonoBehaviour
         CaughtCubes.Remove(cube);
         Destroy(cube, 2f);
         Debug.Log("removecube");
-        if(CaughtCubes.Count == 1 && StateManager.CurrentState != StateManager.State.EndPlatform)
+        if(CaughtCubes.Count <= 1 && StateManager.CurrentState != StateManager.State.EndPlatform)
         {
             StateManager.CurrentState = StateManager.State.Lost;
-            walker.enabled = false;
+            Invoke("DisableWalker", 1f);
+            GetComponentInChildren<PlayerMovement>().enabled = false;
+            LevelMan.ReLoadLevel();
         }
         if (CaughtCubes.Count == 0 && StateManager.CurrentState == StateManager.State.EndPlatform)
         {
             StateManager.CurrentState = StateManager.State.Won;
-            walker.enabled = false;
+            WinConfiguration();
         }
+    }
+
+    public void WinConfiguration()
+    {
+        Invoke("DisableWalker", 1f);
+        GetComponentInChildren<PlayerMovement>().enabled = false;
+        LevelMan.LoadNextLevel();
+    }
+
+    private void DisableWalker()
+    {
+        walker.enabled = false;
     }
 
     public void FallToTheGround()
